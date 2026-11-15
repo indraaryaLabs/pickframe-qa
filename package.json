@@ -1,0 +1,35 @@
+{
+  "name": "pickframe-qa",
+  "version": "1.0.0",
+  "description": "Black-box QA suite for PickFrame: API contract, browser journeys, accessibility and load checks against the deployed product.",
+  "private": true,
+  "license": "MIT",
+  "author": "Indra Arya",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:e2e": "playwright test --project=e2e-desktop --project=e2e-mobile",
+    "test:a11y": "playwright test --project=e2e-desktop tests/e2e/a11y.spec.ts",
+    "report": "playwright show-report",
+    "load": "k6 run load/smoke.js",
+    "verify": "npm run typecheck && npm run lint && npm run format:check"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.15.0",
+    "eslint-plugin-playwright": "^2.12.2",
+    "prettier": "^3.10.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2"
+  }
+}
