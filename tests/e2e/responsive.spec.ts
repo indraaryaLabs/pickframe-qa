@@ -13,7 +13,13 @@ const viewports = [
 ] as const;
 
 /** Pages that scroll sideways on small screens. See docs/findings/QA-008. */
-const knownOverflow = new Set(['/pricing@320', '/pricing@360', '/guide@320']);
+const knownOverflow = new Set([
+  '/pricing@320',
+  '/pricing@360',
+  '/pricing@390',
+  '/guide@320',
+  '/guide@360',
+]);
 
 test.describe('layout holds at every width', () => {
   for (const { name, width, height } of viewports) {

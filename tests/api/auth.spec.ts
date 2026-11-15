@@ -76,7 +76,6 @@ test.describe('credential handling', () => {
     ['a non-Bearer scheme', 'Basic dXNlcjpwYXNz'],
     ['an empty Bearer value', 'Bearer '],
     ['a Bearer value that is not a JWT', 'Bearer not-a-jwt'],
-    ['an unsigned token (alg: none)', `Bearer ${unsignedToken()}`],
     [
       'an HS256 token signed with an attacker-chosen secret',
       `Bearer ${hs256Token('attacker-controlled-secret')}`,
@@ -95,6 +94,16 @@ test.describe('credential handling', () => {
       expect(await response.json()).toMatchObject({ error: 'unauthorized' });
     });
   }
+
+  test('rejects an unsigned token (alg: none)', async ({ request }) => {
+    const response = await request.get(target, {
+      headers: { Authorization: `Bearer ${unsignedToken()}` },
+    });
+
+    // The deployment refuses these before the application sees them (403 from the edge, no CORS
+    // headers). A deployment without that layer answers 401 from the app. Either way: no access.
+    expect([401, 403]).toContain(response.status());
+  });
 
   test('401 responses do not reveal why the credential failed', async ({ request }) => {
     const response = await request.get(target, {

@@ -37,7 +37,7 @@ Eight defects found in production, each with evidence and a suggested fix.
 | [QA-005](docs/findings/QA-005.md) | Missing assets return the HTML app shell instead of 404    | Minor    |
 | [QA-006](docs/findings/QA-006.md) | Low-contrast text on landing, pricing and sign-in          | Major    |
 | [QA-007](docs/findings/QA-007.md) | Button accessible names omit their visible text            | Minor    |
-| [QA-008](docs/findings/QA-008.md) | Pricing and guide pages scroll sideways on small phones    | Minor    |
+| [QA-008](docs/findings/QA-008.md) | Pricing and guide pages scroll sideways on phones          | Minor    |
 
 ## Getting started
 
