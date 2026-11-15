@@ -12,16 +12,16 @@ const viewports = [
   { name: 'wide desktop', width: 1920, height: 1080 },
 ] as const;
 
-/** Pages that scroll sideways on small screens. See docs/findings/QA-008. */
-const knownOverflow = new Set([
-  '/pricing@320',
-  '/pricing@360',
-  '/pricing@390',
-  '/guide@320',
-  '/guide@360',
-]);
+/**
+ * Motion is reduced and web fonts are awaited before measuring. Entrance animations park content
+ * off-screen with transforms, and font swaps change text widths, so measuring earlier gives
+ * different answers on different runs.
+ */
+const knownOverflow = new Set(['/pricing@320', '/pricing@360', '/guide@320']);
 
 test.describe('layout holds at every width', () => {
+  test.use({ reducedMotion: 'reduce' });
+
   for (const { name, width, height } of viewports) {
     for (const path of pages) {
       test(`${path} has no horizontal scroll on a ${name} (${width}px)`, async ({ page }) => {
@@ -33,13 +33,19 @@ test.describe('layout holds at every width', () => {
         await page.setViewportSize({ width, height });
         await openAndSettle(page, path);
 
-        const overflow = await page.evaluate(() => ({
-          scroll: document.documentElement.scrollWidth,
-          client: document.documentElement.clientWidth,
-        }));
+        await page.evaluate(() => document.fonts.ready);
+
+        const overflow = await page.evaluate(() => {
+          const client = document.documentElement.clientWidth;
+          const offenders = [...document.body.querySelectorAll('*')]
+            .filter((el) => el.getBoundingClientRect().right > client + 1)
+            .slice(0, 5)
+            .map((el) => `${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0] ?? ''}`);
+          return { scroll: document.documentElement.scrollWidth, client, offenders };
+        });
         expect(
           overflow.scroll,
-          `scrollWidth ${overflow.scroll} > clientWidth ${overflow.client}`,
+          `scrollWidth ${overflow.scroll} > clientWidth ${overflow.client}; wider than the screen: ${overflow.offenders.join(', ')}`,
         ).toBeLessThanOrEqual(overflow.client);
       });
     }
